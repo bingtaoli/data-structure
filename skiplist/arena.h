@@ -35,13 +35,13 @@ private:
     char* alloc_fallback(size_t bytes);
     char* alloc_new_block(size_t block_bytes);
 
-    char* alloc_ptr_;
-    size_t remaining_;
+    char* alloc_ptr_;  //(bt) 当前空闲内存 block 内的可用地址
+    size_t remaining_;  // (bt) 当前空闲内存 block 内的可用大小
 
     mutable Mutex mutex_;
 
-    std::vector<char*> blocks_;
-    size_t blocks_size_;
+    std::vector<char*> blocks_;  // 已经申请的内存 block
+    size_t blocks_size_;  ///累计分配的内存大小, memtable 内的数据量就用这个值表示
 };
 
 } // namespace yodb

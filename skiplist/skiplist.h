@@ -72,6 +72,9 @@ private:
     Node* find_less_than(const Key& key) const;
 };
 
+/**
+ * (bt)定义node类型，struct一般表示数据类型
+ */
 template<class Key, class Comparator>
 struct SkipList<Key, Comparator>::Node {
     explicit Node(const Key& k) : key(k) { } 
@@ -92,7 +95,7 @@ SkipList<Key, Comparator>::new_node(const Key& key, size_t height)
 {
     size_t size = sizeof(Node) + sizeof(Node*) * (height - 1);
     char* alloc_ptr = arena_.alloc_aligned(size);
-
+    // (bt) 强转?
     return new (alloc_ptr) Node(key);
 }
 
@@ -141,6 +144,7 @@ inline void SkipList<Key, Comparator>::Iterator::seek(const Key& target)
         node_ = NULL;
 }
 
+// (bt) 定位到头节点最低高度的 node 即可
 template<class Key, class Comparator>
 inline void SkipList<Key, Comparator>::Iterator::seek_to_first()
 {
@@ -158,6 +162,7 @@ inline void SkipList<Key, Comparator>::Iterator::seek_to_middle()
         node_ = node_->next(0);
 }
 
+// (bt) 从头节点的最高开始，依次前进，知道达到链表尾。
 template<class Key, class Comparator>
 inline void SkipList<Key, Comparator>::Iterator::seek_to_last()
 {
@@ -213,6 +218,7 @@ SkipList<Key, Comparator>::find_greater_or_equal(const Key& key, Node** prev) co
         if (next != NULL && compare_(next->key, key) < 0) {
             curr = next;
         } else {
+            // (bt) next为NULL了，表示没有找到，到下一层去，保留上一层的位置到prev数组中
             if (prev != NULL)
                 prev[level] = curr;
 
@@ -230,7 +236,7 @@ SkipList<Key, Comparator>::find_less_than(const Key& key) const
 {
     Node* curr = head_;
     size_t level = max_height_ - 1;
-
+    // (bt) 从最高层往下查找，找到就返回；没找到返回NULL
     while (true) {
         Node* next = curr->next(level);
 
@@ -245,6 +251,9 @@ SkipList<Key, Comparator>::find_less_than(const Key& key) const
     }
 }
 
+/**
+ * (bt) SkipList的构造函数
+ */
 template<class Key, class Comparator>
 SkipList<Key, Comparator>::SkipList(Comparator cmp)
     : arena_(), head_(new_node(Key(), kMaxHeight)),
@@ -252,7 +261,7 @@ SkipList<Key, Comparator>::SkipList(Comparator cmp)
       compare_(cmp), seed_(time(NULL))
 {
     srand(seed_);
-
+    // (bt) 初始化每一层
     for (int i = 0; i < kMaxHeight; i++)
         head_->set_next(i, NULL);
 }
@@ -275,6 +284,7 @@ void SkipList<Key, Comparator>::insert(const Key& key)
     if (next && equal(next->key, key)) {
         next->set_key(key);
     } else {
+        // (bt) 根据prev保留的位置，为每一层插入新的node
         Node* curr = new_node(key, height);
 
         for (size_t i = 0; i < height; i++) {

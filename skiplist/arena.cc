@@ -15,6 +15,13 @@ Arena::~Arena()
     clear();
 }
 
+/**
+ * Arena 每次按 kBlockSize(4096)单位向系统申请内存，提供地址对齐的内存，记录内存使用。
+ * 当 memtable 申请内存时，如果 size 不大于 kBlockSize 的四分之一，就在当前空闲的内存 block 中 分配，
+ * 否则，直接向系统申请(malloc)。这个策略是为了能更好的服务小内存的申请，避免个别大 内存使用影响。
+ * @param
+ * @return
+ */
 char* Arena::alloc(size_t bytes)
 {
     assert(bytes > 0);
@@ -55,6 +62,11 @@ char* Arena::alloc_aligned(size_t bytes)
     return result;
 }
 
+/**
+ * 当alloc某个size不够时，向系统申请新的内存；如果bytes>kBlockSize / 4直接向系统申请，否则申请一个block，再在block中申请
+ * @param
+ * @return
+ */
 char* Arena::alloc_fallback(size_t bytes)
 {
     if (bytes > kBlockSize / 4)
