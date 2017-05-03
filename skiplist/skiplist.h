@@ -86,6 +86,10 @@ struct SkipList<Key, Comparator>::Node {
     void set_key(const Key& k) { key = k; }
 
 private:
+    /**
+     * 每一个node的next是一个数组，分别是该node在每一层的下一个节点，因为每一层都有某个node的指针。
+     * 比如next_[1]就是该node在第一层的下一个node; next_[2]就是该node在第二层的下一个node
+     */
     Node* next_[1];
 };
 
@@ -284,7 +288,7 @@ void SkipList<Key, Comparator>::insert(const Key& key)
     if (next && equal(next->key, key)) {
         next->set_key(key);
     } else {
-        // (bt) 根据prev保留的位置，为每一层插入新的node
+        // (bt) 表中没有key，根据prev保留的位置，为每一层插入新的node，每一层拥有的只是指针，这样方便删除
         Node* curr = new_node(key, height);
 
         for (size_t i = 0; i < height; i++) {
@@ -307,6 +311,9 @@ bool SkipList<Key, Comparator>::contains(const Key& key) const
         return false;
 }
 
+/**
+ * 删除某个key，找到具有key的最高level，每一层都删除
+ */
 template<class Key, class Comparator>
 void SkipList<Key, Comparator>::erase(const Key& key)
 {
@@ -318,6 +325,7 @@ void SkipList<Key, Comparator>::erase(const Key& key)
 
     for (size_t i = 0; i < max_height_; i++) {
         if (prev[i]->next(i) == curr)
+            // (bt) 把指针指向其他地方
             prev[i]->set_next(i, curr->next(i));
     }
 

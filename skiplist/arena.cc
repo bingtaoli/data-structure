@@ -95,6 +95,7 @@ char* Arena::alloc_new_block(size_t block_bytes)
 
 size_t Arena::usage() const 
 {
+    // (bt) 使用ScopedMutex的构造和析构来完成锁的加锁和释放，有点类似python的上下文with实现锁
     ScopedMutex lock(mutex_);
     return blocks_size_ + blocks_.capacity() * (sizeof(char*));
 }
