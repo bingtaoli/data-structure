@@ -209,6 +209,9 @@ int SkipList<Key, Comparator>::random_height()
     return height;
 }
 
+/**
+ * prev: 保留每一层最后一个比key小的数的index
+ */
 template<class Key, class Comparator>
 typename SkipList<Key, Comparator>::Node* 
 SkipList<Key, Comparator>::find_greater_or_equal(const Key& key, Node** prev) const
@@ -304,7 +307,7 @@ template<class Key, class Comparator>
 bool SkipList<Key, Comparator>::contains(const Key& key) const
 {
     Node* x = find_greater_or_equal(key, NULL);
-
+    // (bt) 可以认为最上面的每一层都是下一层的索引，如果包含的话，最底层一定存在
     if (x != NULL && equal(x->key, key))
         return true;
     else

@@ -63,7 +63,8 @@ char* Arena::alloc_aligned(size_t bytes)
 }
 
 /**
- * 当alloc某个size不够时，向系统申请新的内存；如果bytes>kBlockSize / 4直接向系统申请，否则申请一个block，再在block中申请
+ * 当alloc某个size不够时，向系统申请新的内存；
+ * 如果bytes>kBlockSize / 4直接向系统申请; 否则向系统申请一个block，再在block中申请
  * @param
  * @return
  */
@@ -76,7 +77,7 @@ char* Arena::alloc_fallback(size_t bytes)
     remaining_ = kBlockSize;
 
     char* result = alloc_ptr_;
-
+    // (bt) alloc_ptr右移bytes位
     alloc_ptr_ += bytes;
     remaining_ -= bytes;
 

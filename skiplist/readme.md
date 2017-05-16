@@ -1,10 +1,14 @@
-SkipList
+## SkipList
 
 关于skiplist的原理一篇博客已经写得很好了，[http://www.spongeliu.com/63.html](http://www.spongeliu.com/63.html)
 
 下面的介绍都是从这篇博客中摘录的。
 
+无论查找、插入、删除，跳表的时间复杂度都是**O(lgn)**！这就是为什么我们要引入跳表。
+
 ### 查找
+
+<img src="medias/3.png">
 
 ```c
 p=top
